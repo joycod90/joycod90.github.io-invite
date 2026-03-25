@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Access Granted</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: url("https://drive.google.com/file/d/14UdL2OH5EFVhmqHvQDar6R2E5I1UaRMS/view?usp=drivesdk") no-repeat center/cover;
+  font-family: 'Montserrat', sans-serif;
+  color: #F5E6C8;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  animation: fadeIn 1.2s ease;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 0.15em;
+  font-size: 2.5em;
+}
+
+p {
+  color: #D6C6A5;
+  margin: 10px 0;
+}
+
+#countdown {
+  margin-top: 20px;
+  font-size: 2em;
+}
+
+#line {
+  width: 120px;
+  height: 2px;
+  background: rgba(255,255,255,0.2);
+  margin: 10px auto;
+  position: relative;
+  overflow: hidden;
+}
+
+#leopard {
+  position: absolute;
+  left: 0;
+  top: -12px;
+  display: inline-block;
+}
+
+/* animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="container">
+  <h1>ACCESS GRANTED</h1>
+
+  <p>You have been selected.</p>
+
+  <p>Stand by…</p>
+
+  <div id="line">
+    <span id="leopard">🐆</span>
+  </div>
+
+  <div id="countdown">7</div>
+</div>
+
+<!-- Audio -->
+<audio id="jingle" src="https://drive.google.com/file/d/1QFDtkwURKGT-xA4LSCET2poMr5PXtcvF/view?usp=drivesdk" preload="auto"></audio>
+
+<script>
+const leopard = document.getElementById("leopard");
+const countdownEl = document.getElementById("countdown");
+const audio = document.getElementById("jingle");
+
+let position = 0;
+let toggle = false;
+let timeLeft = 7;
+
+// lancer audio (avec petit délai)
+setTimeout(() => {
+  audio.play().catch(() => {});
+}, 500);
+
+// animation leopard (sprite illusion)
+setInterval(() => {
+  toggle = !toggle;
+  leopard.style.transform = toggle 
+    ? "translateY(2px) rotate(5deg)" 
+    : "translateY(-2px) rotate(-5deg)";
+}, 200);
+
+// déplacement (loading bar)
+setInterval(() => {
+  position += 2;
+  leopard.style.left = position + "px";
+
+  if (position > 100) {
+    position = 0;
+  }
+}, 50);
+
+// countdown + redirection
+const timer = setInterval(() => {
+  timeLeft--;
+  countdownEl.textContent = timeLeft;
+
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    window.location.href = "https://drive.google.com/file/d/1UEaEP33jCEXT2KQAKL_5rLkbfirYEvlk/view?usp=drivesdk";
+  }
+}, 1000);
+</script>
+
+</body>
+</html>
