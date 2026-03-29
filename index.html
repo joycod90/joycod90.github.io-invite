@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Access Granted</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* ─── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: url('bg.jpg') no-repeat center center / cover;
+    background-attachment: fixed;
+    font-family: 'Montserrat', sans-serif;
+    color: #F5E6C8;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+  }
+
+  /* ─── Écran noir initial ───────────────────────────────── */
+  #black {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 1.2s ease;
+    pointer-events: auto;
+  }
+
+  #black.gone {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ─── Overlay ambiance ─────────────────────────────────── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.55);
+    animation: breathe 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes breathe {
+    0%, 100% { background: rgba(0,0,0,0.55); }
+    50%       { background: rgba(0,0,0,0.72); }
+  }
+
+  /* ─── Grain overlay ────────────────────────────────────── */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    opacity: 0.04;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* ─── Container principal ──────────────────────────────── */
+  .container {
+    position: relative;
+    z-index: 10;
+    padding: 24px 20px;
+    max-width: 92%;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ─── Titre ────────────────────────────────────────────── */
+  #title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.9rem, 7vw, 2.8rem);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+    margin-bottom: 6px;
+    text-shadow: 0 0 40px rgba(245, 220, 160, 0.35);
+  }
+
+  #title.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── Séparateur fin ───────────────────────────────────── */
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: rgba(245, 230, 200, 0.4);
+    margin: 14px auto;
+    opacity: 0;
+    transition: opacity 0.8s ease, width 1s ease;
+  }
+
+  .divider.visible {
+    opacity: 1;
+    width: 80px;
+  }
+
+  /* ─── Textes ───────────────────────────────────────────── */
+  .tagline {
+    font-weight: 300;
+    font-size: clamp(0.82rem, 3.2vw, 1rem);
+    letter-spacing: 0.12em;
+    color: #D6C6A5;
+    line-height: 1.9;
+    margin-top: 12px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .tagline.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── Barre de progression ─────────────────────────────── */
+  #progressTrack {
+    width: min(70vw, 240px);
+    height: 2px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 1px;
+    margin: 22px auto 10px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  #progressTrack.visible {
+    opacity: 1;
+  }
+
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, transparent, #F5E6C8, transparent);
+    border-radius: 1px;
+    transition: width linear;
+  }
+
+  /* ─── Countdown ────────────────────────────────────────── */
+  #countdown {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 10vw, 3.8rem);
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.6s ease, transform 0.6s ease, color 0.4s ease;
+    line-height: 1;
+    margin-top: 4px;
+  }
+
+  #countdown.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #countdown.urgent {
+    color: #e8c060;
+    animation: urgentPulse 0.6s ease-in-out infinite;
+  }
+
+  @keyframes urgentPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.06); }
+  }
+
+  /* ─── Texte final ──────────────────────────────────────── */
+  #finalText {
+    font-size: clamp(0.7rem, 2.5vw, 0.82rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245, 230, 200, 0.5);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    margin-top: 10px;
+  }
+
+  #finalText.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── Flash de sortie ──────────────────────────────────── */
+  #exitFlash {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  #exitFlash.flash {
+    opacity: 1;
+  }
+
+  /* ════════════════════════════════════════════════════════
+     ─── Traces de pas ─────────────────────────────────────
+     ════════════════════════════════════════════════════════ */
+  #footsteps-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .footstep {
+    position: absolute;
+    width: 10px;
+    height: 16px;
+    border-radius: 40% 40% 50% 50% / 50% 50% 60% 60%;
+    background: radial-gradient(
+      ellipse at 40% 35%,
+      rgba(255, 215, 0, 0.92) 0%,
+      rgba(255, 215, 0, 0.45) 45%,
+      transparent 100%
+    );
+    opacity: 0;
+    will-change: opacity, transform;
+    filter: drop-shadow(0 0 5px rgba(255, 200, 50, 0.7))
+            drop-shadow(0 0 12px rgba(255, 180, 0, 0.35));
+  }
+
+  /* ─── Léopard emoji final ──────────────────────────────── */
+  #leopard-final {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 2.2rem;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    z-index: 4;
+    filter: drop-shadow(0 0 16px rgba(255, 200, 50, 0.6));
+  }
+
+  #leopard-final.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+</style>
+</head>
+
+<body>
+
+  <div id="black"></div>
+  <div class="overlay"></div>
+  <div class="grain"></div>
+  <div id="exitFlash"></div>
+
+  <!-- Traces de pas + léopard final -->
+  <div id="footsteps-container">
+    <div id="leopard-final">🐆</div>
+  </div>
+
+  <div class="container">
+    <h1 id="title">ACCESS GRANTED</h1>
+    <div class="divider" id="divider"></div>
+
+    <!--
+      #sprite conservé dans le DOM mais masqué.
+      Le JS original référence spriteInterval — on évite toute
+      erreur de référence en gardant l'élément présent.
+    -->
+    <div id="sprite" style="display:none;"></div>
+
+    <p class="tagline" id="text1">You have been chosen.</p>
+    <p class="tagline" id="text2">The gates are opening…</p>
+    <p class="tagline" id="text3">Stand by.</p>
+
+    <div id="progressTrack">
+      <div id="progressBar"></div>
+    </div>
+
+    <div id="countdown">7</div>
+    <div id="finalText">Only a few will pass.</div>
+  </div>
+
+  <audio id="jingle" src="jingle.mp3" preload="auto"></audio>
+
+<script>
+  // ════════════════════════════════════════════════════════
+  // ─── Configuration ─────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  const REDIRECT_URL  = "TON_LIEN_FINAL";   // ← à remplacer
+  const COUNTDOWN_SEC = 7;
+  // Sprite désactivé — variables conservées pour éviter les erreurs
+  const FRAME_WIDTH   = 180;
+  const TOTAL_FRAMES  = 6;
+  const FRAME_RATE_MS = 130;
+
+  // ─── Refs DOM ──────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const black         = $("black");
+  const sprite        = $("sprite");
+  const countdown     = $("countdown");
+  const finalText     = $("finalText");
+  const progressTrack = $("progressTrack");
+  const progressBar   = $("progressBar");
+  const exitFlash     = $("exitFlash");
+  const audio         = $("jingle");
+  const footstepsCont = $("footsteps-container");
+  const leopardFinal  = $("leopard-final");
+
+  // ─── Helpers ───────────────────────────────────────────
+  function show(el, delay = 0) {
+    setTimeout(() => el.classList.add("visible"), delay);
+  }
+
+  function tryPlayAudio() {
+    audio.play().catch(() => {});
+  }
+
+  // ─── Fallback audio ────────────────────────────────────
+  document.addEventListener("touchstart", tryPlayAudio, { once: true, passive: true });
+
+  // ─── Sprite désactivé proprement ──────────────────────
+  // spriteInterval existe pour que clearInterval() dans le bloc countdown
+  // ne génère pas d'erreur
+  let frame = 0;
+  const spriteInterval = setInterval(() => { /* sprite remplacé par footsteps */ }, FRAME_RATE_MS);
+
+  // ════════════════════════════════════════════════════════
+  // ─── TRACES DE PAS ─────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+
+  /*
+    Parcours : bas-gauche → bas-droite → diagonale vers le centre
+    9 pas, déclenchés sur COUNTDOWN_SEC - 0.5s = 6.5s
+    Le dernier pas arrive au centre au moment du tick final.
+
+    x, y  : position en % de l'écran (responsive)
+    r     : rotation en degrés (alternance gauche/droite = pas naturels)
+  */
+  const FOOTSTEP_PATH = [
+    { x:  8, y: 88, r: -25 },   // 1 — bas gauche
+    { x: 18, y: 84, r:  20 },   // 2
+    { x: 30, y: 87, r: -18 },   // 3
+    { x: 44, y: 89, r:  22 },   // 4 — bas milieu
+    { x: 58, y: 85, r: -20 },   // 5
+    { x: 74, y: 81, r:  18 },   // 6 — bas droite
+    { x: 68, y: 67, r: -30 },   // 7 — remontée diagonale
+    { x: 58, y: 56, r:  25 },   // 8
+    { x: 50, y: 47, r: -15 },   // 9 — centre countdown
+  ];
+
+  const STEPS_TOTAL_MS = (COUNTDOWN_SEC - 0.5) * 1000;                    // 6500ms
+  const STEP_INTERVAL  = Math.floor(STEPS_TOTAL_MS / FOOTSTEP_PATH.length); // ~722ms
+  const FADE_IN_MS     = 320;
+  const HOLD_MS        = 850;
+  const FADE_OUT_MS    = 650;
+
+  function spawnFootstep(pos) {
+    const el = document.createElement("div");
+    el.classList.add("footstep");
+
+    el.style.left      = pos.x + "%";
+    el.style.top       = pos.y + "%";
+    // transform initial : centré + réduit + rotation
+    el.style.transform = `translate(-50%, -50%) rotate(${pos.r}deg) scale(0.3)`;
+    el.style.opacity   = "0";
+
+    footstepsCont.appendChild(el);
+
+    // Double rAF pour garantir le premier paint avant la transition
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = `opacity ${FADE_IN_MS}ms ease, transform ${FADE_IN_MS}ms ease`;
+        el.style.opacity    = "1";
+        el.style.transform  = `translate(-50%, -50%) rotate(${pos.r}deg) scale(1)`;
+      });
+    });
+
+    // Fade out + nettoyage DOM
+    setTimeout(() => {
+      el.style.transition = `opacity ${FADE_OUT_MS}ms ease`;
+      el.style.opacity    = "0";
+      setTimeout(() => el.remove(), FADE_OUT_MS + 50);
+    }, FADE_IN_MS + HOLD_MS);
+  }
+
+  function startFootsteps() {
+    FOOTSTEP_PATH.forEach((pos, i) => {
+      setTimeout(() => spawnFootstep(pos), i * STEP_INTERVAL);
+    });
+  }
+
+  // Léopard final — apparaît sur le dernier tick (timeLeft === 1)
+  function triggerLeopard() {
+    leopardFinal.classList.add("visible");
+    // Pulse d'intensité juste avant la redirection
+    setTimeout(() => {
+      leopardFinal.style.transform = "translate(-50%, -50%) scale(1.35)";
+      leopardFinal.style.filter    = "drop-shadow(0 0 30px rgba(255, 200, 50, 0.95))";
+    }, 450);
+  }
+
+  // ════════════════════════════════════════════════════════
+  // ─── TIMELINE PRINCIPALE (préservée à l'identique) ─────
+  // ════════════════════════════════════════════════════════
+
+  // T+0.5s : fade out écran noir
+  setTimeout(() => {
+    black.classList.add("gone");
+    setTimeout(() => black.remove(), 1300);
+  }, 500);
+
+  // T+1.2s : titre + séparateur
+  setTimeout(() => {
+    show($("title"));
+    show($("divider"), 200);
+  }, 1200);
+
+  // T+2.1s : sprite caché — appel conservé, sans effet visuel
+  setTimeout(() => show(sprite), 2100);
+
+  // T+2.7s : textes en cascade
+  setTimeout(() => show($("text1")), 2700);
+  setTimeout(() => show($("text2")), 3200);
+  setTimeout(() => show($("text3")), 3700);
+
+  // T+3.0s : audio
+  setTimeout(tryPlayAudio, 3000);
+
+  // T+4.2s : countdown + barre + traces (tout part en même temps)
+  setTimeout(() => {
+    let timeLeft = COUNTDOWN_SEC;
+
+    show(countdown);
+    show(finalText);
+    progressTrack.classList.add("visible");
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        progressBar.style.transition = `width ${timeLeft}s linear`;
+        progressBar.style.width = "100%";
+      });
+    });
+
+    // ── Démarrage des traces de pas ──
+    startFootsteps();
+
+    // ── Timer countdown ────────────────────────────────
+    const timer = setInterval(() => {
+      timeLeft--;
+
+      if (timeLeft > 0) {
+        countdown.textContent = timeLeft;
+      }
+
+      // Tension finale
+      if (timeLeft <= 3 && timeLeft > 0) {
+        countdown.classList.add("urgent");
+      }
+
+      // Léopard sur le dernier tick visible
+      if (timeLeft === 1) {
+        triggerLeopard();
+      }
+
+      // Redirection
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        clearInterval(spriteInterval);
+        exitFlash.classList.add("flash");
+        setTimeout(() => {
+          window.location.href = REDIRECT_URL;
+        }, 280);
+      }
+    }, 1000);
+
+  }, 4200);
+</script>
+
+</body>
+</html>
