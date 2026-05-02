@@ -1,508 +1,684 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<title>Séance Feu de Camp — OBR</title>
+<title>Access Granted</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-  :root {
-    --gold:    #C9A84C;
-    --gold-lt: #E8C97A;
-    --cream:   #F5ECD7;
-    --ink:     #0E0C09;
-    --muted:   rgba(245, 236, 215, 0.45);
-  }
-
   *, *::before, *::after {
     box-sizing: border-box;
-    margin: 0; padding: 0;
+    margin: 0;
+    padding: 0;
   }
 
   html {
     height: 100%;
-    background: var(--ink);
+    height: -webkit-fill-available;
   }
 
   body {
     min-height: 100vh;
-    background: var(--ink);
-    font-family: 'Montserrat', sans-serif;
-    color: var(--cream);
+    min-height: -webkit-fill-available;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding: 0 0 60px;
-    overflow-x: hidden;
-    opacity: 0;
-    animation: fadeIn 1.2s ease 0.2s forwards;
-  }
-
-  @keyframes fadeIn { to { opacity: 1; } }
-
-  body::before {
-    content: '';
+    text-align: center;
+    background: #000;
+    font-family: 'Montserrat', sans-serif;
+    color: #F5E6C8;
+    overflow: hidden;
     position: fixed;
     inset: 0;
-    opacity: 0.035;
-    pointer-events: none;
-    z-index: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 200px;
   }
 
-  /* ── Header ── */
-  .sigil {
-    width: 100%;
+  /* ════════════════════════════════════════════════════════
+     ─── ÉCRAN D'ENTRÉE "HIT THE DRUMS" ────────────────────
+     ════════════════════════════════════════════════════════ */
+  #gate {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    /* Apparition douce au chargement */
+    opacity: 0;
+    animation: gateIn 1.2s ease 0.3s forwards;
+  }
+
+  @keyframes gateIn {
+    to { opacity: 1; }
+  }
+
+  #gate.leaving {
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    pointer-events: none;
+  }
+
+  /* Ligne décorative supérieure */
+  .gate-rule {
+    width: 1px;
+    height: 0;
+    background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.5));
+    margin-bottom: 32px;
+    animation: ruleGrow 1s ease 1s forwards;
+  }
+
+  @keyframes ruleGrow {
+    to { height: 48px; }
+  }
+
+  /* Symbole tambour — SVG maison, sobre et premium */
+  .drum-wrap {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    margin-bottom: 28px;
+  }
+
+  /* Cercle pulsant derrière le tambour */
+  .drum-ring {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    animation: ringPulse 2.4s ease-in-out infinite;
+  }
+
+  .drum-ring:nth-child(2) {
+    inset: -22px;
+    border-color: rgba(201, 168, 76, 0.12);
+    animation-delay: 0.6s;
+  }
+
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%       { transform: scale(1.08); opacity: 0.5; }
+  }
+
+  /* SVG tambour */
+  .drum-svg {
+    position: relative;
+    z-index: 1;
+    width: 72px;
+    height: 72px;
+    filter: drop-shadow(0 0 14px rgba(201, 168, 76, 0.45));
+    animation: drumFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes drumFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-5px); }
+  }
+
+  /* Titre principal */
+  .gate-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #F5E6C8;
+    text-shadow: 0 0 30px rgba(245, 220, 160, 0.2);
+    margin-bottom: 10px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.4s forwards;
+  }
+
+  /* Sous-titre italique */
+  .gate-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(0.78rem, 3vw, 0.95rem);
+    letter-spacing: 0.12em;
+    color: rgba(201, 168, 76, 0.75);
+    margin-bottom: 44px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.7s forwards;
+  }
+
+  /* Ligne décorative basse */
+  .gate-rule-bottom {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.9s forwards;
+  }
+
+  /* Instruction tap */
+  .gate-cta {
+    font-size: 0.65rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(245, 230, 200, 0.35);
+    opacity: 0;
+    animation: fadeUp 0.8s ease 2.1s forwards, ctaBlink 2.5s ease-in-out 2.5s infinite;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes ctaBlink {
+    0%, 100% { opacity: 0.35; }
+    50%       { opacity: 0.7; }
+  }
+
+  /* Flash de tap (feedback visuel instantané) */
+  #tapFlash {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(201, 168, 76, 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  #tapFlash.hit {
+    opacity: 1;
+  }
+
+
+  /* ════════════════════════════════════════════════════════
+     ─── EXPÉRIENCE PRINCIPALE (identique) ─────────────────
+     ════════════════════════════════════════════════════════ */
+
+  /* fond bg.jpg — visible seulement après le gate */
+  #experience {
+    position: fixed;
+    inset: 0;
+    background: url('bg.jpg') no-repeat center center / cover;
+    background-attachment: fixed;
+    display: none;
+  }
+
+  #black {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 1.2s ease;
+    pointer-events: auto;
+  }
+
+  #black.gone {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.55);
+    animation: breathe 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes breathe {
+    0%, 100% { background: rgba(0,0,0,0.55); }
+    50%       { background: rgba(0,0,0,0.72); }
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    opacity: 0.04;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  .container {
+    position: relative;
+    z-index: 10;
+    padding: 24px 20px;
+    max-width: 92%;
+    width: 360px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 48px 20px 24px;
-    position: relative;
-    z-index: 1;
-    animation: slideDown 1s ease 0.5s both;
+    gap: 0;
   }
 
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .sigil-line {
-    width: 1px;
-    height: 36px;
-    background: linear-gradient(to bottom, transparent, var(--gold));
-    margin-bottom: 16px;
-  }
-
-  .sigil-icon {
-    font-size: 1.6rem;
-    letter-spacing: 0.2em;
-    margin-bottom: 14px;
-    opacity: 0.9;
-  }
-
-  .event-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    font-size: clamp(1.7rem, 7vw, 2.4rem);
-    letter-spacing: 0.14em;
-    text-align: center;
-    color: var(--gold-lt);
-    text-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
-    line-height: 1.15;
-  }
-
-  .event-sub {
-    font-size: 0.65rem;
-    letter-spacing: 0.35em;
+  #title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.9rem, 7vw, 2.8rem);
+    letter-spacing: 0.18em;
+    line-height: 1;
     text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 8px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+    margin-bottom: 6px;
+    text-shadow: 0 0 40px rgba(245, 220, 160, 0.35);
   }
 
-  .rule {
-    width: min(80vw, 280px);
+  #title.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .divider {
+    width: 40px;
     height: 1px;
-    margin: 6px auto 0;
-    z-index: 1;
-    position: relative;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    opacity: 0.5;
+    background: rgba(245, 230, 200, 0.4);
+    margin: 14px auto;
+    opacity: 0;
+    transition: opacity 0.8s ease, width 1s ease;
   }
 
-  /* ── Image invitation ── */
-  .invitation-wrap {
-    position: relative;
-    z-index: 1;
-    width: min(88vw, 380px);
-    margin: 28px auto 0;
-    animation: revealUp 1s ease 0.9s both;
+  .divider.visible {
+    opacity: 1;
+    width: 80px;
   }
 
-  @keyframes revealUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .tagline {
+    font-weight: 300;
+    font-size: clamp(0.82rem, 3.2vw, 1rem);
+    letter-spacing: 0.12em;
+    color: #D6C6A5;
+    line-height: 1.9;
+    margin-top: 12px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
   }
 
-  .invitation-wrap::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border: 1px solid rgba(201, 168, 76, 0.35);
-    border-radius: 2px;
+  .tagline.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #progressTrack {
+    width: min(70vw, 240px);
+    height: 2px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 1px;
+    margin: 22px auto 10px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  #progressTrack.visible { opacity: 1; }
+
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, transparent, #F5E6C8, transparent);
+    border-radius: 1px;
+    transition: width linear;
+  }
+
+  #countdown {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 10vw, 3.8rem);
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.6s ease, transform 0.6s ease, color 0.4s ease;
+    line-height: 1;
+    margin-top: 4px;
+  }
+
+  #countdown.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #countdown.urgent {
+    color: #e8c060;
+    animation: urgentPulse 0.6s ease-in-out infinite;
+  }
+
+  @keyframes urgentPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.06); }
+  }
+
+  #finalText {
+    font-size: clamp(0.7rem, 2.5vw, 0.82rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245, 230, 200, 0.5);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    margin-top: 10px;
+  }
+
+  #finalText.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #exitFlash {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #fff;
+    opacity: 0;
     pointer-events: none;
-    z-index: 2;
+    transition: opacity 0.25s ease;
   }
 
-  .corner {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    border-color: var(--gold);
-    border-style: solid;
-    opacity: 0.7;
+  #exitFlash.flash { opacity: 1; }
+
+  /* ─── Traces de pas ─── */
+  #footsteps-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
     z-index: 3;
   }
-  .corner.tl { top: -4px; left: -4px;  border-width: 1px 0 0 1px; }
-  .corner.tr { top: -4px; right: -4px; border-width: 1px 1px 0 0; }
-  .corner.bl { bottom: -4px; left: -4px;  border-width: 0 0 1px 1px; }
-  .corner.br { bottom: -4px; right: -4px; border-width: 0 1px 1px 0; }
 
-  .invitation-wrap img {
-    width: 100%;
-    display: block;
-    border-radius: 1px;
-  }
-
-  .caption {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-weight: 300;
-    font-size: clamp(0.8rem, 3vw, 0.95rem);
-    letter-spacing: 0.18em;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 16px;
-    animation: revealUp 1s ease 1.2s both;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── Infos événement ── */
-  .event-details {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: min(88vw, 380px);
-    margin: 28px auto 0;
-    position: relative;
-    z-index: 1;
-    animation: revealUp 1s ease 1.4s both;
-  }
-
-  .detail-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 12px 16px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(201,168,76,0.12);
-    border-radius: 2px;
-  }
-
-  .detail-icon {
-    font-size: 1rem;
-    opacity: 0.7;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .detail-text {
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    color: var(--cream);
-    opacity: 0.75;
-    line-height: 1.6;
-  }
-
-  .detail-text strong {
-    display: block;
-    font-weight: 500;
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gold);
-    opacity: 1;
-    margin-bottom: 2px;
-  }
-
-  /* ── Bouton calendrier ── */
-  .cal-wrap {
-    width: min(88vw, 380px);
-    margin: 24px auto 0;
-    position: relative;
-    z-index: 1;
-    animation: revealUp 1s ease 1.6s both;
-  }
-
-  .cal-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 15px 24px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    border-radius: 2px;
-    color: var(--gold-lt);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .cal-btn::before {
-    content: '';
+  .footstep {
     position: absolute;
-    inset: 0;
-    background: var(--gold);
+    width: 10px;
+    height: 16px;
+    border-radius: 40% 40% 50% 50% / 50% 50% 60% 60%;
+    background: radial-gradient(
+      ellipse at 40% 35%,
+      rgba(255, 215, 0, 0.92) 0%,
+      rgba(255, 215, 0, 0.45) 45%,
+      transparent 100%
+    );
     opacity: 0;
-    transition: opacity 0.3s ease;
+    will-change: opacity, transform;
+    filter: drop-shadow(0 0 5px rgba(255, 200, 50, 0.7))
+            drop-shadow(0 0 12px rgba(255, 180, 0, 0.35));
   }
 
-  .cal-btn:hover::before,
-  .cal-btn:active::before { opacity: 0.08; }
-
-  .cal-btn:hover,
-  .cal-btn:active { box-shadow: 0 0 24px rgba(201,168,76,0.2); }
-
-  .cal-btn span, .cal-icon {
-    position: relative;
-    z-index: 1;
-  }
-
-  .cal-icon { font-size: 1rem; }
-
-  /* ── Bouton secret 🤫 ── */
-  .secret-wrap {
-    width: min(88vw, 380px);
-    margin: 10px auto 0;
-    position: relative;
-    z-index: 1;
-    animation: revealUp 1s ease 1.75s both;
-  }
-
-  .secret-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.15);
-    border-radius: 2px;
-    cursor: pointer;
-    font-size: 1.4rem;
-    letter-spacing: 0.1em;
-    transition: border-color 0.3s ease, background 0.3s ease;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .secret-btn:hover,
-  .secret-btn:active {
-    border-color: rgba(201,168,76,0.35);
-    background: rgba(201,168,76,0.04);
-  }
-
-  /* ── Panneau message secret ── */
-  #secretPanel {
-    width: min(88vw, 380px);
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+  #leopard-final {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 2.2rem;
     opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    z-index: 4;
+    filter: drop-shadow(0 0 16px rgba(255, 200, 50, 0.6));
   }
 
-  #secretPanel.open {
-    max-height: 1200px;
+  #leopard-final.visible {
     opacity: 1;
-  }
-
-  .secret-inner {
-    margin-top: 10px;
-    padding: 20px 18px;
-    background: rgba(201,168,76,0.04);
-    border: 1px solid rgba(201,168,76,0.18);
-    border-radius: 2px;
-    text-align: left;
-  }
-
-  .secret-inner p {
-    font-size: 0.8rem;
-    line-height: 1.85;
-    color: rgba(245, 236, 215, 0.72);
-    letter-spacing: 0.03em;
-    white-space: pre-line;
-  }
-
-  .secret-inner .secret-sig {
-    margin-top: 16px;
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 0.85rem;
-    color: var(--gold);
-    opacity: 0.8;
-    letter-spacing: 0.08em;
-  }
-
-  /* ── Pied de page ── */
-  .footer-line {
-    width: 1px;
-    height: 28px;
-    background: linear-gradient(to bottom, var(--gold), transparent);
-    margin: 40px auto 0;
-    opacity: 0.35;
-    position: relative;
-    z-index: 1;
-    animation: revealUp 1s ease 1.95s both;
+    transform: translate(-50%, -50%) scale(1);
   }
 </style>
 </head>
 
 <body>
 
-  <div class="sigil">
-    <div class="sigil-line"></div>
-    <div class="sigil-icon">🔥🌿</div>
-    <h1 class="event-name">Séance Feu de Camp</h1>
-    <p class="event-sub">8 Mai 2026 — Chez Adèle</p>
-  </div>
+  <!-- ══ ÉCRAN D'ENTRÉE ════════════════════════════════════ -->
+  <div id="tapFlash"></div>
 
-  <div class="rule"></div>
+  <div id="gate">
+    <div class="gate-rule"></div>
 
-  <div class="invitation-wrap">
-    <div class="corner tl"></div>
-    <div class="corner tr"></div>
-    <div class="corner bl"></div>
-    <div class="corner br"></div>
-    <img src="invitation.jpg" alt="Séance Feu de Camp OBR" />
-  </div>
+    <div class="drum-wrap">
+      <div class="drum-ring"></div>
+      <div class="drum-ring"></div>
 
-  <p class="caption">Invitation officielle</p>
-
-  <div class="event-details">
-    <div class="detail-row">
-      <span class="detail-icon">🗓</span>
-      <div class="detail-text">
-        <strong>Programme</strong>
-        17h00 — BBQ 🍗🥩<br>
-        18h00 — Verre de l'amitié 🍻<br>
-        19h30 — Gaudeamus
-      </div>
+      <!-- Tambour SVG — élégant, minimaliste, dans l'univers doré -->
+      <svg class="drum-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Corps du tambour -->
+        <ellipse cx="36" cy="52" rx="24" ry="8" fill="rgba(201,168,76,0.15)" stroke="rgba(201,168,76,0.7)" stroke-width="1.2"/>
+        <rect x="12" y="24" width="48" height="28" rx="1" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.6)" stroke-width="1.2"/>
+        <!-- Peau supérieure -->
+        <ellipse cx="36" cy="24" rx="24" ry="8" fill="rgba(201,168,76,0.18)" stroke="rgba(201,168,76,0.9)" stroke-width="1.4"/>
+        <!-- Reflet sur la peau -->
+        <ellipse cx="30" cy="22.5" rx="8" ry="2.5" fill="rgba(255,240,180,0.18)"/>
+        <!-- Cerclage / lug bolts -->
+        <line x1="18" y1="24" x2="14" y2="52" stroke="rgba(201,168,76,0.4)" stroke-width="0.8"/>
+        <line x1="54" y1="24" x2="58" y2="52" stroke="rgba(201,168,76,0.4)" stroke-width="0.8"/>
+        <line x1="28" y1="24" x2="26" y2="52" stroke="rgba(201,168,76,0.3)" stroke-width="0.8"/>
+        <line x1="44" y1="24" x2="46" y2="52" stroke="rgba(201,168,76,0.3)" stroke-width="0.8"/>
+        <!-- Baguette gauche -->
+        <line x1="20" y1="8" x2="34" y2="22" stroke="rgba(245,230,200,0.85)" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="20" cy="7" r="2.5" fill="rgba(245,230,200,0.9)"/>
+        <!-- Baguette droite -->
+        <line x1="52" y1="8" x2="38" y2="22" stroke="rgba(245,230,200,0.85)" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="52" cy="7" r="2.5" fill="rgba(245,230,200,0.9)"/>
+      </svg>
     </div>
-    <div class="detail-row">
-      <span class="detail-icon">📍</span>
-      <div class="detail-text">
-        <strong>Lieu</strong>
-        Chez Adèle<br>
-        Rue Pierre Joseph Redouté 1<br>
-        1348 Ottignies-Louvain-la-Neuve
-      </div>
-    </div>
+
+    <h2 class="gate-title">Hit the Drums</h2>
+    <p class="gate-sub">to begin your passage</p>
+
+    <div class="gate-rule-bottom"></div>
+    <p class="gate-cta">Touch anywhere</p>
   </div>
 
-  <div class="cal-wrap">
-    <a class="cal-btn" id="calBtn" href="#" target="_blank" rel="noopener">
-      <span class="cal-icon">＋</span>
-      <span>Ajouter au calendrier</span>
-    </a>
+  <!-- ══ EXPÉRIENCE PRINCIPALE ═════════════════════════════ -->
+  <div id="experience"></div>
+  <div id="black"></div>
+  <div class="overlay"></div>
+  <div class="grain"></div>
+  <div id="exitFlash"></div>
+
+  <div id="footsteps-container">
+    <div id="leopard-final">🐆</div>
   </div>
 
-  <!-- Bouton secret -->
-  <div class="secret-wrap">
-    <button class="secret-btn" id="secretBtn" aria-expanded="false">🤫</button>
+  <div class="container">
+    <h1 id="title">ACCESS GRANTED</h1>
+    <div class="divider" id="divider"></div>
+    <div id="sprite" style="display:none;"></div>
+    <p class="tagline" id="text1">You have been chosen.</p>
+    <p class="tagline" id="text2">The gates are opening…</p>
+    <p class="tagline" id="text3">Stand by.</p>
+    <div id="progressTrack"><div id="progressBar"></div></div>
+    <div id="countdown">7</div>
+    <div id="finalText">Only a few will pass.</div>
   </div>
 
-  <!-- Panneau message secret -->
-  <div id="secretPanel" aria-hidden="true">
-    <div class="secret-inner">
-      <p>YO! AMAKURU?
-Petit bilan (ou ce qu'il en reste)
-
-D'abord, on vous dit merci d'être venus aux séances et aux divers événements de l'Ordre cette année. Après le rush du Banquet, on peut enfin confirmer que ça s'est passé dans le "débordement" total. L'alcool pleuvait sur nos visages comme la mousson sur Cotonou, et le traiteur ? Ah, il nous a GÂTÉ ! On n'a que des bons retours pour l'instant... Parce que là, les souvenirs sont plus flous que photo prise avec le gsm de Marie-Aimée après une séance.
-
-Ce 1er mai aura lieu une corona pour Accueillir 2 personnes — Etienne Camer et grand voyageur 🇨🇲, et Nadia Tunisienne et spécialiste en couscous Royal à ses heures perdues, ce sera à la salle de la grande ducale à LLN, dans l'après-midi !
-
-📅 L'Ultime Rendez-vous
-
-Ensuite, je viens vers vous pour annoncer la toute dernière séance de l'année académique, le vendredi 08/05.
-⚠️ ATTENTION ⚠️
-Elle ne se passera PAS au Psycho, mais à l'ADELE contrairement à ce qui était écrit dans le "Save the Date" de janvier (OUI, JANVIER ! Adolphe, tu croyais que je sortais cette réunion de ma case de marabout ou quoi ? Eh bien non, mon frère. Il fallait l'enregistrer dans ton Adolphone. Et ramène nous le colis d'ailleurs) !
-
-Verre de l'amitié à 18h pétante 🍻 Gaudeamus à 19h30.
-On vous connaît les africains alors pour vous motiver à arriver à l'heure je vous propose un petit BBQ à partir de 17h dans la pelouse de l'ADELE pour se sustenter au soleil avant de se détruire dans la pénombre ! 🍗🥩🍤
-
-RÉCAP :
-📍 Chez Adèle : Rue Pierre Joseph Redouté 1, 1348 Ottignies-Louvain-la-Neuve
-📅 08/05
-🕠 17h BBQ, 18h Verre de l'amitié, 19h30 Gaudeamus</p>
-      <p class="secret-sig">Pour le Comité,
-Andy USHER Hajayandi
-Grand gourou de vos rêves les plus fous
-USVCFBRIRO 🌴🐆☀️🐆🌴
-
-p.s. : De rien pour cette précieuse minute perdue à lire that long ASS post, vous la récupérerez jamais.</p>
-    </div>
-  </div>
-
-  <div class="footer-line"></div>
+  <audio id="jingle" src="jingle.mp3" preload="auto"></audio>
 
 <script>
-  // ── Calendrier .ics ─────────────────────────────────────
-  // BBQ démarre à 17h CEST = 15h UTC le 08/05
-  // Fin estimée après Gaudeamus ~23h CEST = 21h UTC
-  const event = {
-    title:       "Séance Feu de Camp OBR 🔥🌿",
-    start:       "20260508T150000Z",   // 17h00 CEST = 15h00 UTC
-    end:         "20260508T210000Z",   // 23h00 CEST = 21h00 UTC
-    location:    "Rue Pierre Joseph Redouté 1, 1348 Ottignies-Louvain-la-Neuve",
-    description: "17h BBQ 🍗 — 18h Verre de l'amitié 🍻 — 19h30 Gaudeamus"
-  };
+  // ════════════════════════════════════════════════════════
+  // ─── Configuration ─────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  const REDIRECT_URL  = "TON_LIEN_FINAL";   // ← à remplacer
+  const COUNTDOWN_SEC = 7;
+  const FRAME_RATE_MS = 130;
 
-  const ics = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//OBR//FR",
-    "BEGIN:VEVENT",
-    `DTSTART:${event.start}`,
-    `DTEND:${event.end}`,
-    `SUMMARY:${event.title}`,
-    `LOCATION:${event.location}`,
-    `DESCRIPTION:${event.description}`,
-    "STATUS:CONFIRMED",
-    "END:VEVENT",
-    "END:VCALENDAR"
-  ].join("\r\n");
+  // ─── Refs DOM ──────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const gate          = $("gate");
+  const tapFlash      = $("tapFlash");
+  const experience    = $("experience");
+  const black         = $("black");
+  const sprite        = $("sprite");
+  const countdown     = $("countdown");
+  const finalText     = $("finalText");
+  const progressTrack = $("progressTrack");
+  const progressBar   = $("progressBar");
+  const exitFlash     = $("exitFlash");
+  const audio         = $("jingle");
+  const footstepsCont = $("footsteps-container");
+  const leopardFinal  = $("leopard-final");
 
-  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-  const url  = URL.createObjectURL(blob);
-  document.getElementById("calBtn").href     = url;
-  document.getElementById("calBtn").download = "seance-feu-de-camp-obr.ics";
+  // ─── Helpers ───────────────────────────────────────────
+  function show(el, delay = 0) {
+    setTimeout(() => el.classList.add("visible"), delay);
+  }
 
-  // ── Bouton secret 🤫 ────────────────────────────────────
-  const secretBtn   = document.getElementById("secretBtn");
-  const secretPanel = document.getElementById("secretPanel");
-  let   isOpen      = false;
+  // ════════════════════════════════════════════════════════
+  // ─── GATE : tap pour entrer + débloquer l'audio ────────
+  // ════════════════════════════════════════════════════════
+  let experienceStarted = false;
 
-  secretBtn.addEventListener("click", () => {
-    isOpen = !isOpen;
-    secretPanel.classList.toggle("open", isOpen);
-    secretBtn.setAttribute("aria-expanded", isOpen);
-    secretPanel.setAttribute("aria-hidden",  !isOpen);
+  function handleGateTap() {
+    if (experienceStarted) return;
+    experienceStarted = true;
 
-    // Scroll doux vers le panneau à l'ouverture
-    if (isOpen) {
-      setTimeout(() => {
-        secretPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 150);
-    }
-  });
+    // 1. Feedback visuel immédiat (micro-flash doré)
+    tapFlash.classList.add("hit");
+    setTimeout(() => tapFlash.classList.remove("hit"), 200);
+
+    // 2. Débloquer et lancer l'audio — ici c'est safe car on est
+    //    dans un vrai event handler utilisateur (touch/click)
+    audio.play().catch(() => {});
+
+    // 3. Fade out du gate
+    gate.classList.add("leaving");
+    setTimeout(() => {
+      gate.style.display = "none";
+      // Activer le fond bg.jpg
+      experience.style.display = "block";
+      // Lancer la timeline principale
+      launchExperience();
+    }, 900);
+  }
+
+  gate.addEventListener("click",      handleGateTap, { once: true });
+  gate.addEventListener("touchstart", handleGateTap, { once: true, passive: true });
+
+  // ════════════════════════════════════════════════════════
+  // ─── TRACES DE PAS ─────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  const FOOTSTEP_PATH = [
+    { x:  8, y: 88, r: -25 },
+    { x: 18, y: 84, r:  20 },
+    { x: 30, y: 87, r: -18 },
+    { x: 44, y: 89, r:  22 },
+    { x: 58, y: 85, r: -20 },
+    { x: 74, y: 81, r:  18 },
+    { x: 68, y: 67, r: -30 },
+    { x: 58, y: 56, r:  25 },
+    { x: 50, y: 47, r: -15 },
+  ];
+
+  const STEPS_TOTAL_MS = (COUNTDOWN_SEC - 0.5) * 1000;
+  const STEP_INTERVAL  = Math.floor(STEPS_TOTAL_MS / FOOTSTEP_PATH.length);
+  const FADE_IN_MS     = 320;
+  const HOLD_MS        = 850;
+  const FADE_OUT_MS    = 650;
+
+  function spawnFootstep(pos) {
+    const el = document.createElement("div");
+    el.classList.add("footstep");
+    el.style.left      = pos.x + "%";
+    el.style.top       = pos.y + "%";
+    el.style.transform = `translate(-50%, -50%) rotate(${pos.r}deg) scale(0.3)`;
+    el.style.opacity   = "0";
+    footstepsCont.appendChild(el);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = `opacity ${FADE_IN_MS}ms ease, transform ${FADE_IN_MS}ms ease`;
+        el.style.opacity    = "1";
+        el.style.transform  = `translate(-50%, -50%) rotate(${pos.r}deg) scale(1)`;
+      });
+    });
+
+    setTimeout(() => {
+      el.style.transition = `opacity ${FADE_OUT_MS}ms ease`;
+      el.style.opacity    = "0";
+      setTimeout(() => el.remove(), FADE_OUT_MS + 50);
+    }, FADE_IN_MS + HOLD_MS);
+  }
+
+  function startFootsteps() {
+    FOOTSTEP_PATH.forEach((pos, i) => {
+      setTimeout(() => spawnFootstep(pos), i * STEP_INTERVAL);
+    });
+  }
+
+  function triggerLeopard() {
+    leopardFinal.classList.add("visible");
+    setTimeout(() => {
+      leopardFinal.style.transform = "translate(-50%, -50%) scale(1.35)";
+      leopardFinal.style.filter    = "drop-shadow(0 0 30px rgba(255, 200, 50, 0.95))";
+    }, 450);
+  }
+
+  // ════════════════════════════════════════════════════════
+  // ─── TIMELINE PRINCIPALE ────────────────────────────────
+  // Déclenchée après le tap sur le gate
+  // ════════════════════════════════════════════════════════
+  const spriteInterval = setInterval(() => {}, FRAME_RATE_MS); // placeholder
+
+  function launchExperience() {
+
+    // T+0.5s : fade out écran noir
+    setTimeout(() => {
+      black.classList.add("gone");
+      setTimeout(() => black.remove(), 1300);
+    }, 500);
+
+    // T+1.2s : titre + séparateur
+    setTimeout(() => {
+      show($("title"));
+      show($("divider"), 200);
+    }, 1200);
+
+    // T+2.7s : textes en cascade
+    setTimeout(() => show($("text1")), 2700);
+    setTimeout(() => show($("text2")), 3200);
+    setTimeout(() => show($("text3")), 3700);
+
+    // T+4.2s : countdown + barre + traces
+    setTimeout(() => {
+      let timeLeft = COUNTDOWN_SEC;
+
+      show(countdown);
+      show(finalText);
+      progressTrack.classList.add("visible");
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          progressBar.style.transition = `width ${timeLeft}s linear`;
+          progressBar.style.width = "100%";
+        });
+      });
+
+      startFootsteps();
+
+      const timer = setInterval(() => {
+        timeLeft--;
+
+        if (timeLeft > 0) countdown.textContent = timeLeft;
+
+        if (timeLeft <= 3 && timeLeft > 0) {
+          countdown.classList.add("urgent");
+        }
+
+        if (timeLeft === 1) triggerLeopard();
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          clearInterval(spriteInterval);
+          exitFlash.classList.add("flash");
+          setTimeout(() => {
+            window.location.href = REDIRECT_URL;
+          }, 280);
+        }
+      }, 1000);
+
+    }, 4200);
+  }
 </script>
 
 </body>
